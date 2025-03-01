@@ -6,8 +6,6 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    zip \
-    unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd mysqli pdo pdo_mysql
 
@@ -17,14 +15,12 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Download and extract WordPress
-RUN curl -o wordpress.tar.gz -fSL "https://wordpress.org/latest.tar.gz" \
-    && tar -xzf wordpress.tar.gz -C /var/www/html --strip-components=1 \
-    && rm wordpress.tar.gz \
-    && chown -R www-data:www-data /var/www/html
+# Copy the WordPress files from your repo into the container
+COPY . /var/www/html/
 
-# Copy custom configuration (optional, if you have one)
-# COPY wp-config.php /var/www/html/wp-config.php
+# Set proper permissions for WordPress
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
 
 # Expose port 80
 EXPOSE 80
